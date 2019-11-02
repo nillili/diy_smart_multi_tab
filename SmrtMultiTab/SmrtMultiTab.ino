@@ -39,7 +39,7 @@
 
 // You should get Auth Token in the Blynk App.
 // Go to the Project Settings (nut icon).
-char auth[] = "blynk에서 발급한 토큰"; //test
+char auth[] = "blynk에서 발급한 토큰"; //이선우
 
 // Your WiFi credentials.
 // Set password to "" for open networks.
