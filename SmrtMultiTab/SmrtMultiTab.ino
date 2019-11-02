@@ -47,8 +47,10 @@ char auth[] = "0wB6ZPg2_r53NPFNKs8L7xA4KpjgsjFu"; //이선우 //장정권
 // Set password to "" for open networks.
 char ssid[] = "jjangsvc";
 char pass[] = "123456789a";
+
 const int ledPin =  4;
 int ledState = LOW; 
+
 
 int pinData;
 
