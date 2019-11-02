@@ -36,15 +36,24 @@
 
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
+SimpleTimer timer;
 
 // You should get Auth Token in the Blynk App.
 // Go to the Project Settings (nut icon).
-char auth[] = "blynk에서 발급한 토큰"; //이선우 //장정권
+char auth[] = "3CmeaeOhhrnMFTHUKQVw0iO5eRarQFcl"; 
 
 // Your WiFi credentials.
 // Set password to "" for open networks.
-char ssid[] = "neozio";
-char pass[] = "YourPassword";
+char ssid[] = "jjangsvc";
+char pass[] = "123456789a";
+
+int pinData;
+
+BLYNK_WRITE(V1) //Button Widget is writing to pin V1
+{
+  pinData = param.asInt(); 
+}
+
 
 void setup()
 {
@@ -52,9 +61,23 @@ void setup()
   Serial.begin(9600);//시리얼 포트
 
   Blynk.begin(auth, ssid, pass);
+  timer.setInterval(1000L, sendSensor);
 }
 
 void loop()
 {
   Blynk.run();
+  timer.run();
+}
+
+
+void sendSensor()
+{
+  if(pinData == 1)
+  {
+    Serial.println("on");
+  }else
+  {
+    Serial.println("off");
+  }
 }
