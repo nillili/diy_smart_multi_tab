@@ -48,7 +48,7 @@ char pass[] = "YourPassword";
 void setup()
 {
   // Debug console
-  Serial.begin(9600);
+  Serial.begin(9600);//시리얼 포트
 
   Blynk.begin(auth, ssid, pass);
 }
