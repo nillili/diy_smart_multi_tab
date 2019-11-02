@@ -47,7 +47,8 @@ char auth[] = "0wB6ZPg2_r53NPFNKs8L7xA4KpjgsjFu"; //이선우 //장정권
 // Set password to "" for open networks.
 char ssid[] = "jjangsvc";
 char pass[] = "123456789a";
-
+const int ledPin =  4;
+int ledState = LOW; 
 
 int pinData;
 
@@ -58,6 +59,8 @@ BLYNK_WRITE(V1) //Button Widget is writing to pin V1
 
 void setup()
 {
+
+  pinMode(ledPin, OUTPUT);
   // Debug console
   Serial.begin(9600);//시리얼 포트
 
@@ -77,8 +80,11 @@ void sendSensor()
   if(pinData == 1)
   {
     Serial.println("on");
+    ledState = HIGH;
   }else
   {
     Serial.println("off");
+    ledState = LOW;
   }
+  digitalWrite(ledPin, ledState);
 }
