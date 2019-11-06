@@ -47,18 +47,13 @@ DHT dht(DHTPIN, DHTTYPE);
 // You should get Auth Token in the Blynk App.
 // Go to the Project Settings (nut icon).
 
-
-//char auth[] = "0wB6ZPg2_r53NPFNKs8L7xA4KpjgsjFu"; //이선우
-char auth[] = "3CmeaeOhhrnMFTHUKQVw0iO5eRarQFcl"; //홍상진
-//char auth[] = "MN6w88J069vMz0WSRZyY1co_BpPGHg7x"; //장정권
+char auth[] = "토큰"; //홍상진
 
 
 // Your WiFi credentials.
 // Set password to "" for open networks.
-//char ssid[] = "jjangsvc";
-//char pass[] = "123456789a";
-char ssid[] = "neozio";
-char pass[] = "0536259956";
+char ssid[] = "neo";
+char pass[] = "053";
 
 const int ledPin =  4;
 int ledState = LOW; 
