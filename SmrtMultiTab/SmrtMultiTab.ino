@@ -47,17 +47,20 @@ DHT dht(DHTPIN, DHTTYPE);
 // You should get Auth Token in the Blynk App.
 // Go to the Project Settings (nut icon).
 
-char auth[] = "토큰"; //홍상진
 
+//char auth[] = "토큰"; //홍상진
+//char ssid[] = "neo";
+//char pass[] = "053";
 
-// Your WiFi credentials.
-// Set password to "" for open networks.
-char ssid[] = "neo";
-char pass[] = "053";
 
 const int ledPin =  4;
-int ledState = LOW; 
-
+const int RlyPin =  2;
+int ledState   = LOW; 
+int is_time    = 0;   // 타이머
+int temp       = 0;   // 설정온도
+int force_stop = 0;   // 강제
+boolean to_do  = 0;   // 작동
+int is_do      = 0;   // 작동 여부
 
 int pinData;
 
@@ -71,11 +74,19 @@ void setup()
   dht.begin();
   
   pinMode(ledPin, OUTPUT);
+  pinMode(RlyPin, OUTPUT);
+  
   // Debug console
   Serial.begin(9600);//시리얼 포트
 
   Blynk.begin(auth, ssid, pass);
   timer.setInterval(2000L, sendSensor);
+}
+
+BLYNK_CONNECTED() 
+{
+  // Request Blynk server to re-send latest values for all pins
+  Blynk.syncAll();
 }
 
 void loop()
@@ -84,28 +95,61 @@ void loop()
   timer.run();
 }
 
+/**
+ * 타이머값 받기
+ */
+BLYNK_WRITE(V4) 
+{
+   is_time = param.asInt();
+   Serial.print("Input Value from Server (Timer): ");
+   Serial.println(is_time);
+}
+
+/**
+ * 설정온도값 받기
+ */
+BLYNK_WRITE(V5) 
+{
+   temp = param.asInt();
+   Serial.print("Input Value from Server (set temperature): ");
+   Serial.println(temp);
+}
+
+/**
+ * 강제
+ */
+BLYNK_WRITE(V7) 
+{
+   force_stop = param.asInt();
+   Serial.print("Input Value from Server (force stop): ");
+   Serial.println(force_stop);
+}
+
+
+float h = 0;           // 습도     
+float t = 0;        // 온도
 
 void sendSensor()
 {
 
-  // 온습도 읽기
-
-  float h = dht.readHumidity();           // 습도     
-  float t = dht.readTemperature();        // 온도
+  /**
+   * 온습도 읽기
+   * 서버에 값을 전달
+   */
+  h = dht.readHumidity();           // 습도     
+  t = dht.readTemperature();        // 온도
 
   if (isnan(h) || isnan(t)) 
   {
     Serial.println(F("Failed to read from DHT sensor!"));
     return;
   }
-
-
-  Serial.print(F("Humidity: "));
-  Serial.print(h);
-  Serial.print(F("%  Temperature: "));
-  Serial.print(t);
-  Serial.println(F("°C "));
-
+//  Serial.print(F("Humidity: "));
+//  Serial.print(h);
+//  Serial.print(F("%  Temperature: "));
+//  Serial.print(t);
+//  Serial.println(F("°C "));
+//
   
   Blynk.virtualWrite(V2, t);
   Blynk.virtualWrite(V3, h);
@@ -122,4 +166,49 @@ void sendSensor()
     ledState = LOW;
   }
   digitalWrite(ledPin, ledState);
+
+  /**
+   * 조건 처리
+   * 타이머     is_time
+   * 설정온도   temp
+   * 현재온도   t
+   * 강제      force_stop
+   * 작동      to_do
+   */
+  if(is_time == 1)
+  {
+    if(t >= temp)
+    {
+      to_do = true;
+    }else
+    {
+      to_do = false;
+    }
+  }else
+  {
+    to_do = false; 
+  }
+
+
+  /**
+   * 작동
+   */
+  if(force_stop == 1)
+  {
+    digitalWrite(RlyPin, !to_do);
+  }else
+  {
+    digitalWrite(RlyPin, to_do);
+  }
+
+  /**
+   * 채크
+   */
+  if(digitalRead(RlyPin) == 0)
+  {
+    Blynk.virtualWrite(V6, 0);
+  }else
+  {
+    Blynk.virtualWrite(V6, 255);
+  }
 }
