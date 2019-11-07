@@ -209,6 +209,6 @@ void sendSensor()
     Blynk.virtualWrite(V6, 0);
   }else
   {
-    Blynk.virtualWrite(V6, 255);
+    Blynk.virtualWrite(V6, 1);
   }
 }
