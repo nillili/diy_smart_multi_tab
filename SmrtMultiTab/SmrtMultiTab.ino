@@ -47,10 +47,10 @@ DHT dht(DHTPIN, DHTTYPE);
 // You should get Auth Token in the Blynk App.
 // Go to the Project Settings (nut icon).
 
+//char auth[] = "3"; //홍상진
+//char ssid[] = "n";
+//char pass[] = "0";
 
-//char auth[] = "토큰"; //홍상진
-//char ssid[] = "neo";
-//char pass[] = "053";
 
 
 const int ledPin =  4;
@@ -61,6 +61,15 @@ int temp       = 0;   // 설정온도
 int force_stop = 0;   // 강제
 boolean to_do  = 0;   // 작동
 int is_do      = 0;   // 작동 여부
+
+// 딜레이타임 설정
+unsigned long previousMillis  = 0;
+unsigned long currentMillis   = 0;
+int interval=1000;
+int delay_time = -1;     // 지연시간(분)
+
+
+const boolean relay_on = LOW; // 릴레이 작동 방법 LOW/HIGH 레벨
 
 int pinData;
 
@@ -75,6 +84,7 @@ void setup()
   
   pinMode(ledPin, OUTPUT);
   pinMode(RlyPin, OUTPUT);
+  digitalWrite(RlyPin, !relay_on);
   
   // Debug console
   Serial.begin(9600);//시리얼 포트
@@ -103,6 +113,7 @@ BLYNK_WRITE(V4)
    is_time = param.asInt();
    Serial.print("Input Value from Server (Timer): ");
    Serial.println(is_time);
+   snapshotTime(0);
 }
 
 /**
@@ -113,6 +124,7 @@ BLYNK_WRITE(V5)
    temp = param.asInt();
    Serial.print("Input Value from Server (set temperature): ");
    Serial.println(temp);
+   snapshotTime(0);
 }
 
 /**
@@ -123,6 +135,7 @@ BLYNK_WRITE(V7)
    force_stop = param.asInt();
    Serial.print("Input Value from Server (force stop): ");
    Serial.println(force_stop);
+   snapshotTime(0);
 }
 
 
@@ -131,7 +144,7 @@ float t = 0;        // 온도
 
 void sendSensor()
 {
-
+  
   /**
    * 온습도 읽기
    * 서버에 값을 전달
@@ -144,71 +157,84 @@ void sendSensor()
     Serial.println(F("Failed to read from DHT sensor!"));
     return;
   }
-//  Serial.print(F("Humidity: "));
-//  Serial.print(h);
-//  Serial.print(F("%  Temperature: "));
-//  Serial.print(t);
-//  Serial.println(F("°C "));
-//
   
   Blynk.virtualWrite(V2, t);
   Blynk.virtualWrite(V3, h);
 
-  //////
-  
-  if(pinData == 1)
+  // 딜레이 타임
+  if((unsigned long)(millis() - previousMillis) >= interval)
   {
-    Serial.println("on");
-    ledState = HIGH;
-  }else
-  {
-    Serial.println("off");
-    ledState = LOW;
-  }
-  digitalWrite(ledPin, ledState);
-
-  /**
-   * 조건 처리
-   * 타이머     is_time
-   * 설정온도   temp
-   * 현재온도   t
-   * 강제      force_stop
-   * 작동      to_do
-   */
-  if(is_time == 1)
-  {
-    if(t >= temp)
+    /**
+     * 조건 처리
+     * 타이머     is_time
+     * 설정온도   temp
+     * 현재온도   t
+     * 강제      force_stop
+     * 작동      to_do
+     */
+    if(is_time == 1)
     {
-      to_do = true;
+      if(t >= temp)
+      {
+        to_do = true;
+        snapshotTime(1);
+      }else
+      {
+        to_do = false;
+      }
     }else
     {
-      to_do = false;
+      to_do = false; 
     }
-  }else
-  {
-    to_do = false; 
-  }
-
-
-  /**
-   * 작동
-   */
-  if(force_stop == 1)
-  {
-    digitalWrite(RlyPin, !to_do);
-  }else
-  {
-    digitalWrite(RlyPin, to_do);
+  
+  
+    /**
+     * 작동
+     */
+    if(force_stop == 1)
+    {
+      if(relay_on == LOW)
+      {
+        digitalWrite(RlyPin, to_do);  
+      }else
+      {
+        digitalWrite(RlyPin, !to_do);  
+      }
+      
+  
+    }else
+    {
+      if(to_do == true)
+      {
+        digitalWrite(RlyPin, relay_on);
+      }else
+      {
+        digitalWrite(RlyPin, !relay_on);
+      }
+    }
   }
 
   /**
    * 채크
+   * 작동중/ 멈춤
    */
-  if(digitalRead(RlyPin) == 0)
-  {
-    Blynk.virtualWrite(V6, 0);
-  }else
+  if(digitalRead(RlyPin) == relay_on)
   {
     Blynk.virtualWrite(V6, 1);
+  }else
+  {
+    Blynk.virtualWrite(V6, 0);
   }
+
+  
+}
+
+/**
+ * Delay Time Set
+ * 단위 : 분
+ */
+void snapshotTime(int delay_time)
+{
+  previousMillis = millis();
+  interval = delay_time*1000*60;
 }
