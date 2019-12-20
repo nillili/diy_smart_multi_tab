@@ -51,6 +51,9 @@ DHT dht(DHTPIN, DHTTYPE);
 //char ssid[] = "n";
 //char pass[] = "0";
 
+char auth[] = "3CmeaeOhhrnMFTHUKQVw0iO5eRarQFcl"; //홍상진
+char ssid[] = "schl";
+char pass[] = "41559956";
 
 
 const int ledPin =  4;
@@ -174,10 +177,10 @@ void sendSensor()
      */
     if(is_time == 1)
     {
-      if(t >= temp)
+      if(t <= temp)
       {
         to_do = true;
-        snapshotTime(1);
+        snapshotTime(60);
       }else
       {
         to_do = false;
