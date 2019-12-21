@@ -43,7 +43,7 @@ SimpleTimer timer;
 
 
 //char auth[] = "0wB6ZPg2_r53NPFNKs8L7xA4KpjgsjFu"; //이선우
-//char auth[] = "3CmeaeOhhrnMFTHUKQVw0iO5eRarQFcl"; //홍상진
+char auth[] = "3CmeaeOhhrnMFTHUKQVw0iO5eRarQFcl"; //홍상진
 //char auth[] = "MN6w88J069vMz0WSRZyY1co_BpPGHg7x"; //장정권
 
 
