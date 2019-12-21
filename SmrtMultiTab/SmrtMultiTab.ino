@@ -51,9 +51,9 @@ DHT dht(DHTPIN, DHTTYPE);
 //char ssid[] = "n";
 //char pass[] = "0";
 
-char auth[] = "3CmeaeOhhrnMFTHUKQVw0iO5eRarQFcl"; //홍상진
+char auth[] = "3CmeaeOhh"; //홍상진
 char ssid[] = "schl";
-char pass[] = "41559956";
+char pass[] = "4155";
 
 
 const int ledPin =  4;
