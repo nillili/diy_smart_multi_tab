@@ -51,7 +51,6 @@ DHT dht(DHTPIN, DHTTYPE);
 //char ssid[] = "n";
 //char pass[] = "0";
 
-
 char auth[] = "8cLE7jXmOzE_-S3TSWRRPkMzMFbMFvLm"; //홍상진
 char ssid[] = "jjangsvc";
 char pass[] = "123456789a";
@@ -65,6 +64,7 @@ int temp       = 0;   // 설정온도
 int force_stop = 0;   // 강제
 boolean to_do  = 0;   // 작동
 int is_do      = 0;   // 작동 여부
+int cnt_error = 0;    // wifi 접속 실패 회수
 
 // 딜레이타임 설정
 unsigned long previousMillis  = 0;
@@ -105,8 +105,23 @@ BLYNK_CONNECTED()
 
 void loop()
 {
-  Blynk.run();
-  timer.run();
+  if (Blynk.connected())
+  {
+    Blynk.run();
+    timer.run();
+  }else
+  {
+    Serial.print("Blynk Server not connected!!!");    
+    cnt_error++;
+    if(cnt_error > 30)
+    {
+      cnt_error= 0;
+      delay(1000);
+      ESP.reset();
+      delay(1000);      
+    }
+  }  
+
 }
 
 /**
