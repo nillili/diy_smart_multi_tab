@@ -52,9 +52,9 @@ DHT dht(DHTPIN, DHTTYPE);
 //char pass[] = "0";
 
 
-char auth[] = "3CmeaeOhh"; //홍상진
-char ssid[] = "schl";
-char pass[] = "4155";
+char auth[] = "8cLE7jXmOzE_-S3TSWRRPkMzMFbMFvLm"; //홍상진
+char ssid[] = "jjangsvc";
+char pass[] = "123456789a";
 
 
 const int ledPin =  4;
@@ -161,7 +161,8 @@ void sendSensor()
     Serial.println(F("Failed to read from DHT sensor!"));
     return;
   }
-  
+
+  Serial.println(t);
   Blynk.virtualWrite(V2, t);
   Blynk.virtualWrite(V3, h);
 
