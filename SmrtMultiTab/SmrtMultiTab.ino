@@ -51,8 +51,12 @@ DHT dht(DHTPIN, DHTTYPE);
 //char ssid[] = "n";
 //char pass[] = "0";
 
+
+
 const int ledPin =  4;
 const int RlyPin =  2;
+const int SwhPin =  5;
+
 int ledState   = LOW; 
 int is_time    = 0;   // 타이머
 int temp       = 0;   // 설정온도
@@ -82,6 +86,8 @@ void setup()
   
   pinMode(ledPin, OUTPUT);
   pinMode(RlyPin, OUTPUT);
+  pinMode(SwhPin, INPUT);
+  
   digitalWrite(RlyPin, !relay_on);
   
   // Debug console
@@ -139,6 +145,7 @@ BLYNK_WRITE(V7)
 
 float h = 0;           // 습도     
 float t = 0;        // 온도
+int swtch = 0;
 
 void sendSensor()
 {
@@ -156,61 +163,75 @@ void sendSensor()
     return;
   }
 
+  swtch = digitalRead(SwhPin);
+
   Serial.println(t);
+  Serial.println(swtch);
+  
   Blynk.virtualWrite(V2, t);
   Blynk.virtualWrite(V3, h);
 
-  // 딜레이 타임
-  if((unsigned long)(millis() - previousMillis) >= interval)
+  if(swtch != HIGH)
   {
-    /**
-     * 조건 처리
-     * 타이머     is_time
-     * 설정온도   temp
-     * 현재온도   t
-     * 강제      force_stop
-     * 작동      to_do
-     */
-    if(is_time == 1)
+    // 버턴이 눌려지지 않으면
+    // 프로그램에 의한 제어
+
+    // 딜레이 타임
+    if((unsigned long)(millis() - previousMillis) >= interval)
     {
-      if(t <= temp)
+      /**
+       * 조건 처리
+       * 타이머     is_time
+       * 설정온도   temp
+       * 현재온도   t
+       * 강제      force_stop
+       * 작동      to_do
+       */
+      if(is_time == 1)
       {
-        to_do = true;
-        snapshotTime(60);
+        if(t <= temp)
+        {
+          to_do = true;
+          snapshotTime(60);
+        }else
+        {
+          to_do = false;
+        }
       }else
       {
-        to_do = false;
+        to_do = false; 
       }
-    }else
-    {
-      to_do = false; 
+    
+    
+      /**
+       * 작동
+       */
+      if(force_stop == 1)
+      {
+        if(relay_on == LOW)
+        {
+          digitalWrite(RlyPin, to_do);  
+        }else
+        {
+          digitalWrite(RlyPin, !to_do);  
+        }
+        
+    
+      }else
+      {
+        if(to_do == true)
+        {
+          digitalWrite(RlyPin, relay_on);
+        }else
+        {
+          digitalWrite(RlyPin, !relay_on);
+        }
+      }
     }
-  
-  
-    /**
-     * 작동
-     */
-    if(force_stop == 1)
-    {
-      if(relay_on == LOW)
-      {
-        digitalWrite(RlyPin, to_do);  
-      }else
-      {
-        digitalWrite(RlyPin, !to_do);  
-      }
-      
-  
-    }else
-    {
-      if(to_do == true)
-      {
-        digitalWrite(RlyPin, relay_on);
-      }else
-      {
-        digitalWrite(RlyPin, !relay_on);
-      }
-    }
+  }else
+  {
+    // 버턴이 눌려졌을때 강제 작동
+    digitalWrite(RlyPin, relay_on);
   }
 
   /**
