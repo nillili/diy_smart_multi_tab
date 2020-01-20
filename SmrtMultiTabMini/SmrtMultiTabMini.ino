@@ -51,10 +51,9 @@ DHT dht(DHTPIN, DHTTYPE);
 //char ssid[] = "n";
 //char pass[] = "0";
 
-char auth[] = "3CmeaeOhhrnMFTHUKQVw0iO5eRarQFcl"; //홍상진
-char ssid[] = "schl";
-char pass[] = "41559956";
-
+char auth[] = "8cLE7jXmOzE_-S3TSWRRPkMzMFbMFvLm"; //홍상진
+char ssid[] = "jjangsvc";
+char pass[] = "123456789a";
 
 const int ledPin =  4;
 const int RlyPin =  2;
@@ -66,7 +65,6 @@ int temp       = 0;   // 설정온도
 int force_stop = 0;   // 강제
 boolean to_do  = 0;   // 작동
 int is_do      = 0;   // 작동 여부
-int cnt_error  = 0;   // 에러 발생(접속 불량) 카운트
 
 // 딜레이타임 설정
 unsigned long previousMillis  = 0;
@@ -75,7 +73,7 @@ int interval=1000;
 int delay_time = -1;     // 지연시간(분)
 
 
-const boolean RELAY_ON = LOW; // 릴레이 작동 방법 LOW/HIGH 레벨
+const boolean relay_on = LOW; // 릴레이 작동 방법 LOW/HIGH 레벨
 
 int pinData;
 
@@ -92,7 +90,7 @@ void setup()
   pinMode(RlyPin, OUTPUT);
   pinMode(SwhPin, INPUT);
   
-  digitalWrite(RlyPin, !RELAY_ON);
+  digitalWrite(RlyPin, !relay_on);
   
   // Debug console
   Serial.begin(9600);//시리얼 포트
@@ -107,26 +105,10 @@ BLYNK_CONNECTED()
   Blynk.syncAll();
 }
 
-
 void loop()
 {
-  if (Blynk.connected())
-  {
-    Blynk.run();
-    timer.run();
-  }else
-  {
-    Serial.print("Blynk Server not connected!!!");    
-    cnt_error++;
-    if(cnt_error > 30)
-    {
-      cnt_error= 0;
-      delay(1000);
-      ESP.reset();
-      delay(1000);      
-    }
-  }  
-
+  Blynk.run();
+  timer.run();
 }
 
 /**
@@ -229,9 +211,8 @@ void sendSensor()
        */
       if(force_stop == 1)
       {
-        if(RELAY_ON == LOW)
+        if(relay_on == LOW)
         {
-          // Low 방식이면
           digitalWrite(RlyPin, to_do);  
         }else
         {
@@ -243,24 +224,24 @@ void sendSensor()
       {
         if(to_do == true)
         {
-          digitalWrite(RlyPin, RELAY_ON);
+          digitalWrite(RlyPin, relay_on);
         }else
         {
-          digitalWrite(RlyPin, !RELAY_ON);
+          digitalWrite(RlyPin, !relay_on);
         }
       }
     }
   }else
   {
     // 버턴이 눌려졌을때 강제 작동
-    digitalWrite(RlyPin, RELAY_ON);
+    digitalWrite(RlyPin, relay_on);
   }
 
   /**
    * 채크
    * 작동중/ 멈춤
    */
-  if(digitalRead(RlyPin) == RELAY_ON)
+  if(digitalRead(RlyPin) == relay_on)
   {
     Blynk.virtualWrite(V6, 1);
   }else
