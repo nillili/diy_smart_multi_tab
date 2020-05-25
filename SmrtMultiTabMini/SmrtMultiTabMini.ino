@@ -34,13 +34,13 @@
 #define BLYNK_PRINT Serial
 
 
-#include <ESP8266WiFi.h>
+//#include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
 SimpleTimer timer;
 
 // 온습도 센서 init
 #include "DHT.h"
-#define DHTPIN 14
+#define DHTPIN D6
 #define DHTTYPE DHT11
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -52,12 +52,12 @@ DHT dht(DHTPIN, DHTTYPE);
 //char pass[] = "0";
 
 char auth[] = "8cLE7jXmOzE_-S3TSWRRPkMzMFbMFvLm"; //홍상진
-char ssid[] = "jjangsvc";
-char pass[] = "123456789a";
+char ssid[] = "neozio";
+char pass[] = "0536259956";
 
-const int ledPin =  4;
-const int RlyPin =  2;
-const int SwhPin =  5;
+const int ledPin =  D4;
+const int RlyPin =  D2;
+//const int SwhPin =  D5;
 
 int ledState   = LOW; 
 int is_time    = 0;   // 타이머
@@ -84,19 +84,22 @@ BLYNK_WRITE(V1) //Button Widget is writing to pin V1
 
 void setup()
 {
-  dht.begin();
+  // Debug console
+  Serial.begin(115200);//시리얼 포트
+  
   
   pinMode(ledPin, OUTPUT);
   pinMode(RlyPin, OUTPUT);
-  pinMode(SwhPin, INPUT);
+//  pinMode(SwhPin, INPUT);
   
-  digitalWrite(RlyPin, !relay_on);
-  
-  // Debug console
-  Serial.begin(9600);//시리얼 포트
+  digitalWrite(RlyPin, !relay_on);  
 
   Blynk.begin(auth, ssid, pass);
+  
+
   timer.setInterval(2000L, sendSensor);
+  
+  dht.begin();  
 }
 
 BLYNK_CONNECTED() 
@@ -147,7 +150,7 @@ BLYNK_WRITE(V7)
 
 float h = 0;           // 습도     
 float t = 0;        // 온도
-int swtch = 0;
+int swtch = LOW;
 
 void sendSensor()
 {
@@ -165,20 +168,23 @@ void sendSensor()
     return;
   }
 
-  swtch = digitalRead(SwhPin);
+// 외부 스위치에 의해 강제 작동
+//  swtch = digitalRead(SwhPin);
+
 
   Serial.println(t);
   Serial.println(h);
-  Serial.println(swtch);
+  Serial.println(is_time);
   
   Blynk.virtualWrite(V2, t);
   Blynk.virtualWrite(V3, h);
 
+Serial.println("------------------->p");
   if(swtch != HIGH)
   {
     // 버턴이 눌려지지 않으면
     // 프로그램에 의한 제어
-
+Serial.println("------------------->a");
     // 딜레이 타임
     if((unsigned long)(millis() - previousMillis) >= interval)
     {
@@ -204,18 +210,24 @@ void sendSensor()
       {
         to_do = false; 
       }
-    
-    
+
+      Serial.print("todo:");
+      Serial.println(to_do);
+
+      Serial.println("------------------->1");
       /**
        * 작동
        */
       if(force_stop == 1)
       {
+        Serial.println("------------------->2");
         if(relay_on == LOW)
         {
+          Serial.println("------------------->3");
           digitalWrite(RlyPin, to_do);  
         }else
         {
+          Serial.println("------------------->4");
           digitalWrite(RlyPin, !to_do);  
         }
         
@@ -224,9 +236,11 @@ void sendSensor()
       {
         if(to_do == true)
         {
+          Serial.println("------------------->5");
           digitalWrite(RlyPin, relay_on);
         }else
         {
+          Serial.println("------------------->6");
           digitalWrite(RlyPin, !relay_on);
         }
       }
