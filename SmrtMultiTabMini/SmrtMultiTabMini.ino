@@ -52,8 +52,11 @@ DHT dht(DHTPIN, DHTTYPE);
 //char pass[] = "0";
 
 char auth[] = "8cLE7jXmOzE_-S3TSWRRPkMzMFbMFvLm"; //홍상진
-char ssid[] = "neozio";
-char pass[] = "0536259956";
+//char ssid[] = "neozio";
+//char pass[] = "0536259956";
+char ssid[] = "DIR-825";
+char pass[] = "74118236";
+
 
 const int ledPin =  D4;
 const int RlyPin =  D2;
@@ -196,8 +199,11 @@ Serial.println("------------------->a");
        * 강제      force_stop
        * 작동      to_do
        */
-      if(is_time == 1)
-      {
+ /**
+  * 시연을 위해 알람기능은 꺼 둠
+  */
+//      if(is_time == 1)
+//      {
         if(t <= temp)
         {
           to_do = true;
@@ -206,10 +212,10 @@ Serial.println("------------------->a");
         {
           to_do = false;
         }
-      }else
-      {
-        to_do = false; 
-      }
+//      }else
+//      {
+//        to_do = false; 
+//      }
 
       Serial.print("todo:");
       Serial.println(to_do);
