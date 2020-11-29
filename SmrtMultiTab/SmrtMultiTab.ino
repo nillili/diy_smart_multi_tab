@@ -33,7 +33,7 @@
 /* Comment this out to disable prints and save space */
 #define BLYNK_PRINT Serial
 
-
+#include "userinfo.h"
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
 SimpleTimer timer;
@@ -51,9 +51,9 @@ DHT dht(DHTPIN, DHTTYPE);
 //char ssid[] = "n";
 //char pass[] = "0";
 
-char auth[] = "3CmeaeOhhrnMFTHUKQVw0iO5eRarQFcl"; //홍상진
-char ssid[] = "schl";
-char pass[] = "41559956";
+extern const char auth[];
+extern const char ssid[];
+extern const char pass[];
 
 
 const int ledPin =  4;

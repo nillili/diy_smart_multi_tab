@@ -33,7 +33,7 @@
 /* Comment this out to disable prints and save space */
 #define BLYNK_PRINT Serial
 
-
+#include "userinfo.h"
 //#include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
 SimpleTimer timer;
@@ -51,11 +51,10 @@ DHT dht(DHTPIN, DHTTYPE);
 //char ssid[] = "n";
 //char pass[] = "0";
 
-char auth[] = "8cLE7jXmOzE_-S3TSWRRPkMzMFbMFvLm"; //홍상진
-//char ssid[] = "neozio";
-//char pass[] = "0536259956";
-char ssid[] = "DIR-825";
-char pass[] = "74118236";
+extern const char auth[];
+extern const char ssid[];
+extern const char pass[];
+
 
 
 const int ledPin =  D4;
@@ -79,16 +78,28 @@ int delay_time = -1;     // 지연시간(분)
 const boolean relay_on = LOW; // 릴레이 작동 방법 LOW/HIGH 레벨
 
 int pinData;
+int how_many_do = 0;
 
 BLYNK_WRITE(V1) //Button Widget is writing to pin V1
 {
   pinData = param.asInt(); 
 }
 
+/**
+ * 작동시간/ 딜레이
+ */
+BLYNK_WRITE(V8) //Button Widget is writing to pin V1
+{
+  how_many_do = param.asInt(); 
+  Serial.print("Input Value from Server (): ");
+  Serial.println(how_many_do);  
+}
+
+
 void setup()
 {
   // Debug console
-  Serial.begin(115200);//시리얼 포트
+  Serial.begin(9600);//시리얼 포트
   
   
   pinMode(ledPin, OUTPUT);
@@ -202,20 +213,20 @@ Serial.println("------------------->a");
  /**
   * 시연을 위해 알람기능은 꺼 둠
   */
-//      if(is_time == 1)
-//      {
+      if(is_time == 1)
+      {
         if(t <= temp)
         {
           to_do = true;
-          snapshotTime(60);
+          snapshotTime(how_many_do);
         }else
         {
           to_do = false;
         }
-//      }else
-//      {
-//        to_do = false; 
-//      }
+      }else
+      {
+        to_do = false; 
+      }
 
       Serial.print("todo:");
       Serial.println(to_do);
